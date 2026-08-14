@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "net.dialingspoon.respawnrecap.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "GameRendererMixin",
+    "GuiMixin",
+    "KeyboardHandlerMixin",
+    "MinecraftMixin",
+    "MinecraftServerAccessor",
+    "MouseHandlerMixin",
+    "RenderPipelinesAccessor",
+    "RenderTypeAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

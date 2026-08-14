@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "respawnrecap",
+  "version": "${version}",
+  "name": "Respawn Recap",
+  "description": "outer wilds inspired respawn animation",
+  "icon": "icon.png",
+  "authors": [
+    "DialingSpoon"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "mixins": [
+    "respawnrecap.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": ">26.1",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

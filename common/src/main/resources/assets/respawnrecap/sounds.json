@@ -1,0 +1,31 @@
+{
+  "recap.main": {
+    "sounds": [
+      {
+        "name": "respawnrecap:recap/main",
+        "stream": true
+      }
+    ]
+  },
+  "recap.end_portal": {
+    "sounds": [
+      {
+        "name": "respawnrecap:recap/end_portal",
+        "stream": true
+      }
+    ]
+  },
+  "recap.end_nether": {
+    "sounds": [
+      {
+        "name": "respawnrecap:recap/end_nether",
+        "stream": true
+      }
+    ]
+  },
+  "respawn.breath": {
+    "sounds": [
+      "respawnrecap:respawn/breath_3x"
+    ]
+  }
+}

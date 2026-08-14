@@ -1,0 +1,30 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+
+[[mods]]
+modId = "respawnrecap"
+version = "${version}"
+displayName = "Respawn Recap"
+logoFile = "icon.png"
+authors = "DialingSpoon"
+description = '''
+outer wilds inspired respawn animation
+'''
+
+[[dependencies.respawnrecap]]
+modId = "neoforge"
+type = "required"
+versionRange = "(26.1,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.respawnrecap]]
+modId = "minecraft"
+type = "required"
+versionRange = "(26.1,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[mixins]]
+config = "respawnrecap.mixins.json"
