@@ -4,8 +4,7 @@ import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Projection;
-import net.minecraft.client.renderer.ProjectionMatrixBuffer;
+import net.minecraft.client.renderer.CachedPerspectiveProjectionMatrixBuffer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Matrix4fStack;
@@ -16,8 +15,8 @@ public final class RecapRenderer implements AutoCloseable {
     private static final float FAR_PLANE = 100.0F;
     private static final float BLINK_FEATHER_FRACTION = 0.03F;
 
-    private final Projection projection = new Projection();
-    private final ProjectionMatrixBuffer projectionBuffer = new ProjectionMatrixBuffer("Respawn Recap projection");
+    private final CachedPerspectiveProjectionMatrixBuffer projectionBuffer =
+            new CachedPerspectiveProjectionMatrixBuffer("Respawn Recap projection", NEAR_PLANE, FAR_PLANE);
 
     public void render(Minecraft minecraft, FeatureRenderDispatcher dispatcher) {
         float respawnBlink = RecapController.respawnBlinkProgress();
@@ -27,9 +26,11 @@ public final class RecapRenderer implements AutoCloseable {
         }
         int width = Math.max(1, minecraft.getWindow().getWidth());
         int height = Math.max(1, minecraft.getWindow().getHeight());
-        this.projection.setupPerspective(NEAR_PLANE, FAR_PLANE, minecraft.options.fov().get(), width, height);
         RenderSystem.backupProjectionMatrix();
-        RenderSystem.setProjectionMatrix(this.projectionBuffer.getBuffer(this.projection), ProjectionType.PERSPECTIVE);
+        RenderSystem.setProjectionMatrix(
+                this.projectionBuffer.getBuffer(width, height, minecraft.options.fov().get()),
+                ProjectionType.PERSPECTIVE
+        );
         Matrix4fStack modelView = RenderSystem.getModelViewStack();
         modelView.pushMatrix();
         modelView.identity();

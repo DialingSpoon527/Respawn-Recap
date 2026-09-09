@@ -1,6 +1,6 @@
 plugins {
     id "architectury-plugin" version "3.5-SNAPSHOT"
-    id "dev.architectury.loom-no-remap" version "1.14-SNAPSHOT" apply false
+    id "dev.architectury.loom-remap" version "1.14-SNAPSHOT" apply false
     id 'com.gradleup.shadow' version '8.3.10' apply false
 }
 
@@ -14,7 +14,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: "dev.architectury.loom-no-remap"
+    apply plugin: "dev.architectury.loom-remap"
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
 
@@ -28,18 +28,19 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+        mappings loom.officialMojangMappings()
         implementation "com.github.usefulness:webp-imageio:0.11.0"
     }
 
     java {
         withSourcesJar()
 
-        sourceCompatibility = JavaVersion.VERSION_25
-        targetCompatibility = JavaVersion.VERSION_25
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 25
+        it.options.release = 21
     }
 
     publishing {

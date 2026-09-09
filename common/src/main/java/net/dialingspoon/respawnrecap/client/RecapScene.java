@@ -7,11 +7,11 @@ import net.dialingspoon.respawnrecap.client.model.MemoryStreamModel;
 import net.dialingspoon.respawnrecap.client.model.ReplayPlaneModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 
 final class RecapScene {
@@ -115,7 +115,7 @@ final class RecapScene {
             RenderType renderType,
             int tint
     ) {
-        collector.submitModel(model, RENDER_STATE, POSE, renderType, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint, null, 0, null);
+        collector.submitModel(model, RENDER_STATE, POSE, renderType, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint, null, 0, null);
     }
 
     private static int argb(int brightness) {
