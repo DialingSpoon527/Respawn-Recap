@@ -8,9 +8,8 @@ import net.dialingspoon.respawnrecap.client.model.ReplayPlaneModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 
@@ -18,7 +17,6 @@ final class RecapScene {
     private static final ReplayPlaneModel REPLAY_PLANE = ReplayPlaneModel.create();
     private static final MemoryStreamModel STREAM_MODEL = MemoryStreamModel.create();
     private static final MaskModel MASK_MODEL = MaskModel.create();
-    private static final EntityRenderState RENDER_STATE = new EntityRenderState();
     private static final PoseStack POSE = new PoseStack();
 
     private static final float REPLAY_START_DISTANCE = 1.4F;
@@ -41,29 +39,29 @@ final class RecapScene {
     private RecapScene() {
     }
 
-    static void submitEffects(Minecraft minecraft, SubmitNodeCollector collector) {
-        submitReplay(minecraft, collector);
-        submitStreams(collector);
+    static void submitEffects(Minecraft minecraft, MultiBufferSource buffers) {
+        submitStreams(buffers);
+        submitReplay(minecraft, buffers);
     }
 
-    static void submitOccluder(SubmitNodeCollector collector) {
+    static void submitOccluder(MultiBufferSource buffers) {
         POSE.setIdentity();
         POSE.translate(0.0F, 0.0F, maskZ());
         POSE.scale(OCCLUDER_SCALE, OCCLUDER_SCALE, 1.0F);
-        submit(REPLAY_PLANE, collector, RecapRenderTypes.OCCLUDER, 0xFF000000);
+        render(REPLAY_PLANE, buffers, RecapRenderTypes.OCCLUDER, 0xFF000000);
     }
 
-    static void submitMask(SubmitNodeCollector collector) {
+    static void submitMask(MultiBufferSource buffers) {
         POSE.setIdentity();
         POSE.translate(0.0F, 0.0F, maskZ());
         POSE.scale(-1.0F, -1.0F, 1.0F);
         POSE.translate(0.0F, MASK_Y_OFFSET, 0.0F);
         int brightness = Mth.floor(255.0F * MASK_MAX_BRIGHTNESS
                 * RecapTimeline.fraction(MASK_BRIGHTEN_START_MILLIS, RecapTimeline.MASK_END_MILLIS));
-        submit(MASK_MODEL, collector, MASK_MODEL.renderType(MaskModel.TEXTURE), argb(brightness));
+        render(MASK_MODEL, buffers, MASK_MODEL.renderType(MaskModel.TEXTURE), argb(brightness));
     }
 
-    private static void submitReplay(Minecraft minecraft, SubmitNodeCollector collector) {
+    private static void submitReplay(Minecraft minecraft, MultiBufferSource buffers) {
         if (!ReplayRecorder.prepareCurrentFrame(minecraft)) {
             return;
         }
@@ -77,18 +75,18 @@ final class RecapScene {
         POSE.setIdentity();
         POSE.translate(0.0F, 0.0F, -distance);
         POSE.scale(REPLAY_WIDTH, REPLAY_WIDTH / aspect, 1.0F);
-        submit(REPLAY_PLANE, collector, RecapRenderTypes.REPLAY, argb(brightness));
+        render(REPLAY_PLANE, buffers, RecapRenderTypes.REPLAY, argb(brightness));
     }
 
-    private static void submitStreams(SubmitNodeCollector collector) {
-        STREAM_MODEL.setupAnim(RENDER_STATE);
+    private static void submitStreams(MultiBufferSource buffers) {
+        STREAM_MODEL.setupAnim();
         float z = streamZ();
         for (StreamPlacement stream : STREAMS) {
             POSE.setIdentity();
             POSE.translate(0.0F, 0.0F, z + stream.depth());
             POSE.mulPose(Axis.ZP.rotationDegrees(stream.roll()));
             POSE.scale(STREAM_XY_SCALE, STREAM_XY_SCALE, STREAM_Z_SCALE);
-            submit(STREAM_MODEL, collector, RecapRenderTypes.STREAMS, STREAM_TINT);
+            render(STREAM_MODEL, buffers, RecapRenderTypes.STREAMS, STREAM_TINT);
         }
     }
 
@@ -109,13 +107,13 @@ final class RecapScene {
         return -Mth.lerp(progress, RecapTimeline.MASK_START_DISTANCE, RecapTimeline.MASK_END_DISTANCE);
     }
 
-    private static void submit(
-            Model<EntityRenderState> model,
-            SubmitNodeCollector collector,
+    private static void render(
+            Model model,
+            MultiBufferSource buffers,
             RenderType renderType,
             int tint
     ) {
-        collector.submitModel(model, RENDER_STATE, POSE, renderType, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint, null, 0, null);
+        model.renderToBuffer(POSE, buffers.getBuffer(renderType), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint);
     }
 
     private static int argb(int brightness) {

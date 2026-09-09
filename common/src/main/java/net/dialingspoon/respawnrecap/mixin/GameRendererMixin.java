@@ -5,7 +5,6 @@ import net.dialingspoon.respawnrecap.client.ReplayRecorder;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,10 +21,6 @@ public abstract class GameRendererMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
-
-    @Shadow
-    @Final
-    private FeatureRenderDispatcher featureRenderDispatcher;
 
     @Inject(method = "close", at = @At("RETURN"))
     private void respawnrecap$closeRecapRenderer(CallbackInfo ci) {
@@ -45,8 +40,7 @@ public abstract class GameRendererMixin {
     ) {
         ReplayRecorder.capturePendingFrame(this.minecraft);
         this.respawnrecap$recapRenderer.render(
-                this.minecraft,
-                this.featureRenderDispatcher
+                this.minecraft
         );
     }
 }

@@ -5,8 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CachedPerspectiveProjectionMatrixBuffer;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4fStack;
 
 public final class RecapRenderer implements AutoCloseable {
@@ -18,7 +17,7 @@ public final class RecapRenderer implements AutoCloseable {
     private final CachedPerspectiveProjectionMatrixBuffer projectionBuffer =
             new CachedPerspectiveProjectionMatrixBuffer("Respawn Recap projection", NEAR_PLANE, FAR_PLANE);
 
-    public void render(Minecraft minecraft, FeatureRenderDispatcher dispatcher) {
+    public void render(Minecraft minecraft) {
         float respawnBlink = RecapController.respawnBlinkProgress();
         boolean recapActive = RecapController.isActive();
         if (!minecraft.isGameLoadFinished() || (!recapActive && respawnBlink <= 0.0F)) {
@@ -43,19 +42,17 @@ public final class RecapRenderer implements AutoCloseable {
                     .createCommandEncoder()
                     .clearColorTexture(minecraft.getMainRenderTarget().getColorTexture(), BLACK);
 
-            SubmitNodeStorage nodes = dispatcher.getSubmitNodeStorage();
+            MultiBufferSource buffers = minecraft.renderBuffers().bufferSource();
 
-            RecapScene.submitEffects(minecraft, nodes);
-            renderPass(minecraft, dispatcher);
+            RecapScene.submitEffects(minecraft, buffers);
+            renderPass(minecraft);
 
-            RecapScene.submitOccluder(nodes);
-            renderPass(minecraft, dispatcher);
+            RecapScene.submitOccluder(buffers);
+            renderPass(minecraft);
             renderBlink(minecraft, RecapTimeline.blinkProgress());
 
-            RecapScene.submitMask(nodes);
-            renderPass(minecraft, dispatcher);
-
-            dispatcher.endFrame();
+            RecapScene.submitMask(buffers);
+            renderPass(minecraft);
         } finally {
             modelView.popMatrix();
             RenderSystem.restoreProjectionMatrix();
@@ -104,11 +101,10 @@ public final class RecapRenderer implements AutoCloseable {
         vertices.addVertex(1.0F, boundary, 0.0F).setColor(BLACK);
     }
 
-    private static void renderPass(Minecraft minecraft, FeatureRenderDispatcher dispatcher) {
+    private static void renderPass(Minecraft minecraft) {
         RenderSystem.getDevice()
                 .createCommandEncoder()
                 .clearDepthTexture(minecraft.getMainRenderTarget().getDepthTexture(), 1.0D);
-        dispatcher.renderAllFeatures();
         minecraft.renderBuffers().bufferSource().endBatch();
     }
 

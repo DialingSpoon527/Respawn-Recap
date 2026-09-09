@@ -6,12 +6,11 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
 
 import java.util.Random;
 
-public final class MemoryStreamModel extends Model<EntityRenderState> {
+public final class MemoryStreamModel extends Model {
     private static final long ROTATION_DURATION_MILLIS = 16000L;
     private static final long RANDOM_SEED = 0x5245535041574EL;
     private static final float[][] PART_POSITIONS = {
@@ -39,9 +38,7 @@ public final class MemoryStreamModel extends Model<EntityRenderState> {
         }
     }
 
-    @Override
-    public void setupAnim(EntityRenderState state) {
-        super.setupAnim(state);
+    public void setupAnim() {
         float angle = (Util.getMillis() % ROTATION_DURATION_MILLIS)
                 / (float) ROTATION_DURATION_MILLIS * Mth.TWO_PI;
         for (int i = 0; i < this.streamParts.length; i++) {

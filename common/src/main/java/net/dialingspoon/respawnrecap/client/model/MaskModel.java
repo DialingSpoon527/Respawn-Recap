@@ -6,10 +6,9 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 
-public final class MaskModel extends Model<EntityRenderState> {
+public final class MaskModel extends Model {
 	public static final ResourceLocation TEXTURE = RespawnRecap.id("textures/entity/mask.png");
 
 	private MaskModel(ModelPart root) {

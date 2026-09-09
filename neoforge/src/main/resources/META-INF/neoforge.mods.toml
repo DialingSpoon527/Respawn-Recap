@@ -17,14 +17,14 @@ outer wilds inspired respawn animation
 [[dependencies.respawnrecap]]
 modId = "neoforge"
 type = "required"
-versionRange = "(21.8, 21.11)"
+versionRange = "(21.5, 21.9)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.respawnrecap]]
 modId = "minecraft"
 type = "required"
-versionRange = "(1.21.8, 1.21.11)"
+versionRange = "(1.21.5, 1.21.9)"
 ordering = "NONE"
 side = "CLIENT"
 
