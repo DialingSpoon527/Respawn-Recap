@@ -74,7 +74,7 @@ public final class MemoryStreamModel extends Model {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, consumer, packedLight, packedOverlay, color);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay,  float f, float g, float h, float k) {
+        root.render(poseStack, consumer, packedLight, packedOverlay, f, g, h, k);
     }
 }

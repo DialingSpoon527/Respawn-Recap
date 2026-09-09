@@ -47,5 +47,12 @@
       "count": 1,
       "values": [0]
     }
-  ]
+  ],
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha",
+    "srcalpha": "1",
+    "dstalpha": "0"
+  }
 }

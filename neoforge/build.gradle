@@ -71,6 +71,7 @@ shadowJar {
 }
 
 remapJar {
+    atAccessWideners.add('respawnrecap.accesswidener')
     inputFile.set(shadowJar.archiveFile)
     dependsOn shadowJar
     archiveClassifier = null

@@ -2,5 +2,12 @@
   "vertex": "respawnrecap:blink_gradient",
   "fragment": "respawnrecap:blink_gradient",
   "samplers": [],
-  "uniforms": []
+  "uniforms": [],
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha",
+    "srcalpha": "1",
+    "dstalpha": "0"
+  }
 }

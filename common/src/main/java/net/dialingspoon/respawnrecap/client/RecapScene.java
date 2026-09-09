@@ -113,7 +113,8 @@ final class RecapScene {
             RenderType renderType,
             int tint
     ) {
-        model.renderToBuffer(POSE, buffers.getBuffer(renderType), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint);
+        model.renderToBuffer(POSE, buffers.getBuffer(renderType), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                ((tint >> 16) & 0xFF) / 255.0F, ((tint >> 8) & 0xFF) / 255.0F, (tint & 0xFF) / 255.0F, ((tint >> 24) & 0xFF) / 255.0F);
     }
 
     private static int argb(int brightness) {

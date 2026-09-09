@@ -79,7 +79,8 @@ public final class RecapRenderer implements AutoCloseable {
         int openHeight = height - barHeight * 2;
         int featherHeight = Math.min(openHeight / 2, Math.max(1, Math.round(height * BLINK_FEATHER_FRACTION)));
         float boundary = 1.0F - 2.0F * barHeight / height;
-        BufferBuilder vertices = Tesselator.getInstance().begin(
+        BufferBuilder vertices = Tesselator.getInstance().getBuilder();
+        vertices.begin(
                 VertexFormat.Mode.QUADS,
                 DefaultVertexFormat.POSITION_COLOR
         );
@@ -93,21 +94,21 @@ public final class RecapRenderer implements AutoCloseable {
         addSolidQuad(vertices, boundary, 1.0F);
         addSolidQuad(vertices, -1.0F, -boundary);
 
-        RecapRenderTypes.BLINK_GRADIENT_TYPE.draw(vertices.buildOrThrow());
+        RecapRenderTypes.BLINK_GRADIENT_TYPE.end(vertices, VertexSorting.DISTANCE_TO_ORIGIN);
     }
 
     private static void addGradientQuad(VertexConsumer vertices, float boundary, float feather) {
-        vertices.addVertex(-1.0F, boundary, 0.0F).setColor(BLACK);
-        vertices.addVertex(-1.0F, feather, 0.0F).setColor(0x00000000);
-        vertices.addVertex(1.0F, feather, 0.0F).setColor(0x00000000);
-        vertices.addVertex(1.0F, boundary, 0.0F).setColor(BLACK);
+        vertices.vertex(-1.0F, boundary, 0.0F).color(BLACK);
+        vertices.vertex(-1.0F, feather, 0.0F).color(0x00000000);
+        vertices.vertex(1.0F, feather, 0.0F).color(0x00000000);
+        vertices.vertex(1.0F, boundary, 0.0F).color(BLACK);
     }
 
     private static void addSolidQuad(VertexConsumer vertices, float y1, float y2) {
-        vertices.addVertex(-1.0F, y1, 0.0F).setColor(BLACK);
-        vertices.addVertex( 1.0F, y1, 0.0F).setColor(BLACK);
-        vertices.addVertex( 1.0F, y2, 0.0F).setColor(BLACK);
-        vertices.addVertex(-1.0F, y2, 0.0F).setColor(BLACK);
+        vertices.vertex(-1.0F, y1, 0.0F).color(BLACK);
+        vertices.vertex( 1.0F, y1, 0.0F).color(BLACK);
+        vertices.vertex( 1.0F, y2, 0.0F).color(BLACK);
+        vertices.vertex(-1.0F, y2, 0.0F).color(BLACK);
     }
 
     private static void renderPass(Minecraft minecraft) {

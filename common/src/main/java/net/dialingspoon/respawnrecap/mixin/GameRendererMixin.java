@@ -2,7 +2,6 @@ package net.dialingspoon.respawnrecap.mixin;
 
 import net.dialingspoon.respawnrecap.client.RecapRenderer;
 import net.dialingspoon.respawnrecap.client.ReplayRecorder;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Final;
@@ -28,15 +27,15 @@ public abstract class GameRendererMixin {
     }
 
     @Inject(
-            method = "render(Lnet/minecraft/client/DeltaTracker;Z)V",
+            method = "render",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
+                    target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphics;F)V",
                     shift = At.Shift.BEFORE
             )
     )
     private void respawnrecap$renderRecapAfterGui(
-            DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci
+            float f, long l, boolean bl, CallbackInfo ci
     ) {
         ReplayRecorder.capturePendingFrame(this.minecraft);
         this.respawnrecap$recapRenderer.render(
