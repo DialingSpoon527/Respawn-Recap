@@ -1,4 +1,7 @@
 {
   "modmenu.nameTranslation.respawnrecap": "Respawn Recap",
-  "modmenu.descriptionTranslation.respawnrecap": "outer wilds inspired respawn animation"
+  "modmenu.descriptionTranslation.respawnrecap": "outer wilds inspired respawn animation",
+  "respawnrecap.config.title": "Respawn Recap",
+  "respawnrecap.config.minecrafty_audio": "Minecraft-ified Sound: %s",
+  "respawnrecap.config.done": "Done"
 }

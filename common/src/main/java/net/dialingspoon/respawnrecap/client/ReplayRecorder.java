@@ -1,5 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
+import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPWriteParam;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.logging.LogUtils;
 import net.dialingspoon.respawnrecap.mixin.MinecraftServerAccessor;
@@ -10,19 +12,19 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.Util;
 import org.slf4j.Logger;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public final class ReplayRecorder {
@@ -30,7 +32,7 @@ public final class ReplayRecorder {
     private static final int CAPTURE_INTERVAL_TICKS = 100;
     private static final int SNAPSHOT_HEIGHT = 270;
     private static final String SNAPSHOT_PREFIX = "snapshot_";
-    private static final String SNAPSHOT_SUFFIX = ".png";
+    private static final String SNAPSHOT_SUFFIX = ".webp";
     static final int MAX_SNAPSHOTS = 300;
     private static final Object ARCHIVE_LOCK = new Object();
     private static final List<SnapshotFile> ACTIVE_SNAPSHOTS = new ArrayList<>();
@@ -190,7 +192,7 @@ public final class ReplayRecorder {
                         Files.createDirectories(directory);
                         long snapshotId = nextSnapshotId++;
                         Path target = directory.resolve(SNAPSHOT_PREFIX + snapshotId + SNAPSHOT_SUFFIX);
-                        resized.writeToFile(target);
+                        writeWebP90(resized, target);
                         ACTIVE_SNAPSHOTS.add(new SnapshotFile(target, snapshotId));
                         trimArchive();
                     }
@@ -200,6 +202,28 @@ public final class ReplayRecorder {
             LOGGER.warn("Failed to save replay snapshot", exception);
         } finally {
             captureInFlight = false;
+        }
+    }
+
+    public static void writeWebP90(NativeImage image, Path path) throws IOException {
+        int[] pixels = image.getPixels();
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        buffered.setRGB(0, 0, width, height, pixels, 0, width);
+
+        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+        WebPWriteParam params = (WebPWriteParam) writer.getDefaultWriteParam();
+        params.setCompressionType(CompressionType.Lossy);
+        params.setCompressionQuality(0.90f);
+
+        try (FileImageOutputStream output = new FileImageOutputStream(path.toFile())) {
+            writer.setOutput(output);
+            writer.write(null, new IIOImage(buffered, null, null), params);
+        } finally {
+            writer.dispose();
         }
     }
 
@@ -245,7 +269,9 @@ public final class ReplayRecorder {
                     closeImages(loadedFrames);
                     return;
                 }
-                try (InputStream input = Files.newInputStream(path); NativeImage image = NativeImage.read(input)) {
+                try {
+                    BufferedImage buffered = ImageIO.read(path.toFile());
+                    NativeImage image = toNativeImage(buffered);
                     loadedFrames.add(flippedCopy(image));
                 } catch (IOException exception) {
                     LOGGER.warn("Failed to load replay snapshot {}", path, exception);
@@ -257,6 +283,23 @@ public final class ReplayRecorder {
             }
             minecraft.execute(() -> acceptLoadedFrames(loadedFrames, generation));
         });
+    }
+
+    private static NativeImage toNativeImage(BufferedImage buffered) {
+        int width = buffered.getWidth();
+        int height = buffered.getHeight();
+
+        int[] pixels = ((DataBufferInt) buffered.getRaster().getDataBuffer()).getData();
+
+        NativeImage image = new NativeImage(width, height, true);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                image.setPixel(x, y, pixels[y * width + x]);
+            }
+        }
+
+        return image;
     }
 
     private static void acceptLoadedFrames(List<NativeImage> loadedFrames, long generation) {

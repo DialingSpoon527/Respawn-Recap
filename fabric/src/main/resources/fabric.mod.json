@@ -8,11 +8,20 @@
   "authors": [
     "DialingSpoon"
   ],
+  "contact": {
+    "sources": "https://github.com/DialingSpoon527/Respawn-Recap",
+    "issues": "https://github.com/DialingSpoon527/Respawn-Recap/issues"
+  },
   "license": "MIT",
   "environment": "client",
   "mixins": [
     "respawnrecap.mixins.json"
   ],
+  "entrypoints": {
+    "modmenu": [
+      "net.dialingspoon.respawnrecap.client.RespawnRecapModMenu"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.16.9",
     "minecraft": ">26.1",

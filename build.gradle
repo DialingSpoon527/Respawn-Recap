@@ -28,6 +28,7 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+        implementation "com.github.usefulness:webp-imageio:0.11.0"
     }
 
     java {

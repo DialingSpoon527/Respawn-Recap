@@ -2,8 +2,8 @@ package net.dialingspoon.respawnrecap.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.dialingspoon.respawnrecap.client.model.MemoryStreamModel;
 import net.dialingspoon.respawnrecap.client.model.MaskModel;
+import net.dialingspoon.respawnrecap.client.model.MemoryStreamModel;
 import net.dialingspoon.respawnrecap.client.model.ReplayPlaneModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;

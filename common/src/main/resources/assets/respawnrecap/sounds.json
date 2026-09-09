@@ -27,5 +27,29 @@
     "sounds": [
       "respawnrecap:respawn/breath_3x"
     ]
+  },
+  "ow.base": {
+    "sounds": [
+      {
+        "name": "respawnrecap:ow/flashback_base",
+        "stream": true
+      }
+    ]
+  },
+  "ow.overlay": {
+    "sounds": [
+      {
+        "name": "respawnrecap:ow/flashback_overlay1",
+        "stream": true
+      }
+    ]
+  },
+  "ow.end": {
+    "sounds": [
+      {
+        "name": "respawnrecap:ow/flashback_end",
+        "stream": true
+      }
+    ]
   }
 }

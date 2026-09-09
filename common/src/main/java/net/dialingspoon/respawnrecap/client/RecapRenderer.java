@@ -1,7 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
