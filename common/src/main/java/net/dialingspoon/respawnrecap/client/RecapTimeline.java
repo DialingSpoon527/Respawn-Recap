@@ -1,6 +1,6 @@
 package net.dialingspoon.respawnrecap.client;
 
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 
 final class RecapTimeline {
     static final long START_DELAY_MILLIS = 1000L;

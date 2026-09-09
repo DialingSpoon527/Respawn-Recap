@@ -4,12 +4,12 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 public final class ReplayPlaneModel extends Model<EntityRenderState> {
     private ReplayPlaneModel(ModelPart root) {
-        super(root, RenderTypes::entityTranslucent);
+        super(root, RenderType::entityTranslucent);
     }
 
     public static ReplayPlaneModel create() {

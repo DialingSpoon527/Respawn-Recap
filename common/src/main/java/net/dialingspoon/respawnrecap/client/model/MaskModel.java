@@ -5,15 +5,15 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class MaskModel extends Model<EntityRenderState> {
-	public static final Identifier TEXTURE = RespawnRecap.id("textures/entity/mask.png");
+	public static final ResourceLocation TEXTURE = RespawnRecap.id("textures/entity/mask.png");
 
 	private MaskModel(ModelPart root) {
-		super(root, RenderTypes::entityCutout);
+		super(root, RenderType::entityCutout);
 	}
 
 	public static MaskModel create() {

@@ -5,11 +5,11 @@ import com.luciad.imageio.webp.WebPWriteParam;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.logging.LogUtils;
 import net.dialingspoon.respawnrecap.mixin.MinecraftServerAccessor;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.Util;
 import org.slf4j.Logger;
 
 import javax.imageio.IIOImage;

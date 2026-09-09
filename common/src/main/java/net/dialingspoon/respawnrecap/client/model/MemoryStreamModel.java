@@ -1,13 +1,13 @@
 package net.dialingspoon.respawnrecap.client.model;
 
+import net.minecraft.Util;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 
 import java.util.Random;
 
@@ -30,7 +30,7 @@ public final class MemoryStreamModel extends Model<EntityRenderState> {
     private final float[] startingRolls = new float[PART_POSITIONS.length];
 
     private MemoryStreamModel(ModelPart root) {
-        super(root, RenderTypes::entityTranslucent);
+        super(root, RenderType::entityTranslucent);
         ModelPart bbMain = root.getChild("bb_main");
         Random random = new Random(RANDOM_SEED);
         for (int i = 0; i < this.streamParts.length; i++) {

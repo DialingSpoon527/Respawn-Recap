@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -34,7 +34,6 @@ final class RecapSounds {
     private static final Cue OUTER_WILDS_BASE = new Cue("ow.base");
     private static final Cue OUTER_WILDS_OVERLAY = new Cue("ow.overlay");
     private static final Cue OUTER_WILDS_END = new Cue("ow.end");
-    private static boolean gameAudioMuted;
     private static boolean minecraftyAudio;
     private static long outerWildsFadeStartMillis = -1L;
 
@@ -44,8 +43,7 @@ final class RecapSounds {
     static void start(Minecraft minecraft) {
         stop(minecraft);
         minecraftyAudio = isMinecraftyAudioEnabled(minecraft);
-        setGameAudioGain(minecraft, 0.0F);
-        gameAudioMuted = true;
+        minecraft.getSoundManager().stop();
         MAIN.reset();
         END_PORTAL.reset();
         NETHER_PORTAL.reset();
@@ -76,10 +74,6 @@ final class RecapSounds {
         OUTER_WILDS_BASE.stop(minecraft);
         OUTER_WILDS_OVERLAY.stop(minecraft);
         OUTER_WILDS_END.stop(minecraft);
-        if (gameAudioMuted) {
-            setGameAudioGain(minecraft, 1.0F);
-            gameAudioMuted = false;
-        }
     }
 
     static void playRespawnBreath(Minecraft minecraft) {
@@ -111,14 +105,6 @@ final class RecapSounds {
             Files.writeString(config, AUDIO_CONFIG_KEY + "=" + enabled + "\n", StandardCharsets.UTF_8);
             minecraftyAudio = enabled;
         } catch (IOException ignored) {
-        }
-    }
-
-    private static void setGameAudioGain(Minecraft minecraft, float gain) {
-        for (SoundSource source : SoundSource.values()) {
-            if (source != SoundSource.UI) {
-                minecraft.getSoundManager().updateCategoryVolume(source, gain);
-            }
         }
     }
 
@@ -218,7 +204,7 @@ final class RecapSounds {
     }
 
     private static final class LoopSound extends AbstractTickableSoundInstance {
-        private LoopSound(Identifier id, float volume) {
+        private LoopSound(ResourceLocation id, float volume) {
             super(SoundEvent.createVariableRangeEvent(id), SoundSource.UI, RandomSource.create());
             this.looping = true;
             this.relative = true;

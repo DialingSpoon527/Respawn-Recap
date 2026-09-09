@@ -3,31 +3,34 @@ package net.dialingspoon.respawnrecap.client;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.dialingspoon.respawnrecap.RespawnRecap;
 import net.dialingspoon.respawnrecap.mixin.RenderPipelinesAccessor;
 import net.dialingspoon.respawnrecap.mixin.RenderTypeAccessor;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.TextureTransform;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 
 final class RecapRenderTypes {
-    static final Identifier REPLAY_TEXTURE = RespawnRecap.id("replay/current_frame");
+    static final ResourceLocation REPLAY_TEXTURE = RespawnRecap.id("replay/current_frame");
 
-    private static final Identifier STREAM_TEXTURE = RespawnRecap.id("textures/gui/memory_stream.png");
+    private static final ResourceLocation STREAM_TEXTURE = RespawnRecap.id("textures/gui/memory_stream.png");
     private static final long STREAM_CYCLE_MILLIS = 12000L;
     private static final DepthTestFunction OVERLAY_DEPTH = DepthTestFunction.LEQUAL_DEPTH_TEST;
-    private static final TextureTransform STREAM_REVEAL = new TextureTransform(
+    private static final RenderStateShard.TexturingStateShard STREAM_REVEAL = new RenderStateShard.TexturingStateShard(
             "respawn_recap_stream_reveal",
-            () -> new Matrix4f().translation(
-                    0.0F,
-                    1.0F - Util.getMillis() % STREAM_CYCLE_MILLIS / (float) STREAM_CYCLE_MILLIS,
-                    0.0F
-            )
+            () -> RenderSystem.setTextureMatrix(
+                    new Matrix4f().translation(
+                        0.0F,
+                        1.0F - Util.getMillis() % STREAM_CYCLE_MILLIS / (float) STREAM_CYCLE_MILLIS,
+                        0.0F
+                    )
+            ),
+            RenderSystem::resetTextureMatrix
     );
 
     static final RenderType REPLAY = texturedType("replay_screen", REPLAY_TEXTURE, null, DepthTestFunction.LEQUAL_DEPTH_TEST);
@@ -43,11 +46,12 @@ final class RecapRenderTypes {
                     .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
                     .build()
     );
-    public static final RenderType BLINK_GRADIENT_TYPE = RenderTypeAccessor.respawnrecap$create(
+    public static final RenderType BLINK_GRADIENT_TYPE = createType(
             "respawn_recap_blink_gradient",
-            RenderSetup.builder(BLINK_GRADIENT)
-                    .bufferSize(RenderType.SMALL_BUFFER_SIZE)
-                    .createRenderSetup()
+            RenderType.SMALL_BUFFER_SIZE,
+            false,
+            BLINK_GRADIENT,
+            RenderType.CompositeState.builder().createCompositeState(false)
     );
 
     private RecapRenderTypes() {
@@ -55,20 +59,21 @@ final class RecapRenderTypes {
 
     private static RenderType texturedType(
             String name,
-            Identifier texture,
-            TextureTransform transform,
+            ResourceLocation texture,
+            RenderStateShard.TexturingStateShard transform,
             DepthTestFunction depth
     ) {
         RenderPipeline pipeline = pipeline(name, "recap_surface", true, depth);
-        RenderSetup.RenderSetupBuilder setup = RenderSetup.builder(pipeline).withTexture("Sampler0", texture).sortOnUpload();
+        RenderStateShard.TextureStateShard textureShard = new RenderStateShard.TextureStateShard(texture, false);
+        RenderType.CompositeState.CompositeStateBuilder setup = RenderType.CompositeState.builder().setTextureState(textureShard);
         if (transform != null) {
-            setup.setTextureTransform(transform);
+            setup.setTexturingState(transform);
         }
-        return createType(name, setup.createRenderSetup());
+        return createType(name, 1536, true, pipeline, setup.createCompositeState(false));
     }
 
     private static RenderType untexturedType(String name, DepthTestFunction depth) {
-        return createType(name, RenderSetup.builder(pipeline(name, name, false, depth)).createRenderSetup());
+        return createType(name, 1536, false, pipeline(name, name, false, depth), RenderType.CompositeState.builder().createCompositeState(false));
     }
 
     private static RenderPipeline pipeline(String name, String vertexShader, boolean textured, DepthTestFunction depth) {
@@ -87,7 +92,7 @@ final class RecapRenderTypes {
         return RenderPipelinesAccessor.respawnrecap$register(builder.build());
     }
 
-    private static RenderType createType(String name, RenderSetup setup) {
-        return RenderTypeAccessor.respawnrecap$create("respawn_recap_" + name, setup);
+    private static RenderType createType(String name, int bufferSize, boolean sort, RenderPipeline pipeline, RenderType.CompositeState setup) {
+        return RenderTypeAccessor.respawnrecap$create("respawn_recap_" + name, bufferSize, false, sort, pipeline, setup);
     }
 }
