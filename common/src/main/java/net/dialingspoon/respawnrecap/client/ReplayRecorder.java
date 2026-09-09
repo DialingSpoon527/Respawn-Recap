@@ -204,7 +204,7 @@ public final class ReplayRecorder {
     }
 
     public static void writeWebP90(NativeImage image, Path path) throws IOException {
-        int[] pixels = image.getPixels();
+        int[] pixels = swapRedBlue(image.getPixelsRGBA());
 
         int width = image.getWidth();
         int height = image.getHeight();
@@ -223,6 +223,19 @@ public final class ReplayRecorder {
         } finally {
             writer.dispose();
         }
+    }
+
+    private static int[] swapRedBlue(int[] pixels) {
+        for (int i = 0; i < pixels.length; i++) {
+            int color = pixels[i];
+
+            pixels[i] =
+                    (color & 0xFF00FF00)
+                            | ((color & 0x00FF0000) >>> 16)
+                            | ((color & 0x000000FF) << 16);
+        }
+
+        return pixels;
     }
 
     private static void ensureArchiveScope(Minecraft minecraft) {
@@ -287,13 +300,13 @@ public final class ReplayRecorder {
         int width = buffered.getWidth();
         int height = buffered.getHeight();
 
-        int[] pixels = ((DataBufferInt) buffered.getRaster().getDataBuffer()).getData();
+        int[] pixels = swapRedBlue(((DataBufferInt) buffered.getRaster().getDataBuffer()).getData());
 
         NativeImage image = new NativeImage(width, height, true);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                image.setPixel(x, y, pixels[y * width + x]);
+                image.setPixelRGBA(x, y, pixels[y * width + x]);
             }
         }
 

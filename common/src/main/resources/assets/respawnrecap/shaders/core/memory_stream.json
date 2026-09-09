@@ -1,6 +1,6 @@
 {
-  "vertex": "respawnrecap:core/recap_surface",
-  "fragment": "respawnrecap:core/replay_screen",
+  "vertex": "respawnrecap:recap_surface",
+  "fragment": "respawnrecap:memory_stream",
   "samplers": [
     { "name": "Sampler0" }
   ],
@@ -13,6 +13,12 @@
     },
     {
       "name": "ProjMat",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+    },
+    {
+      "name": "TextureMat",
       "type": "matrix4x4",
       "count": 16,
       "values": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]

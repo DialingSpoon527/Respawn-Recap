@@ -1,5 +1,7 @@
 package net.dialingspoon.respawnrecap.client.model;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.Util;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
@@ -28,8 +30,11 @@ public final class MemoryStreamModel extends Model {
     private final ModelPart[] streamParts = new ModelPart[PART_POSITIONS.length];
     private final float[] startingRolls = new float[PART_POSITIONS.length];
 
+    public final ModelPart root;
+
     private MemoryStreamModel(ModelPart root) {
-        super(root, RenderType::entityTranslucent);
+        super(RenderType::entityTranslucent);
+        this.root = root;
         ModelPart bbMain = root.getChild("bb_main");
         Random random = new Random(RANDOM_SEED);
         for (int i = 0; i < this.streamParts.length; i++) {
@@ -66,5 +71,10 @@ public final class MemoryStreamModel extends Model {
                 CubeListBuilder.create().texOffs(-4096, 0).addBox(-32.0F, -32.0F, -2048.0F, 64.0F, 0.0F, 4096.0F, new CubeDeformation(0.0F)),
                 PartPose.offset(x, y, z)
         );
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, int color) {
+        root.render(poseStack, consumer, packedLight, packedOverlay, color);
     }
 }

@@ -8,13 +8,15 @@ import net.dialingspoon.respawnrecap.mixin.RenderTypeAccessor;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderDefines;
-import net.minecraft.client.renderer.ShaderProgram;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.TriState;
 import org.joml.Matrix4f;
 
-final class RecapRenderTypes {
+import java.io.IOException;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+public final class RecapRenderTypes {
     static final ResourceLocation REPLAY_TEXTURE = RespawnRecap.id("replay/current_frame");
 
     private static final ResourceLocation STREAM_TEXTURE = RespawnRecap.id("textures/gui/memory_stream.png");
@@ -31,16 +33,27 @@ final class RecapRenderTypes {
             RenderSystem::resetTextureMatrix
     );
 
-    static final ShaderProgram REPLAY_SHADER = new ShaderProgram(RespawnRecap.id("replay_screen"), DefaultVertexFormat.NEW_ENTITY, ShaderDefines.EMPTY);
-    static final ShaderProgram STREAM_SHADER = new ShaderProgram(RespawnRecap.id("memory_stream"), DefaultVertexFormat.NEW_ENTITY, ShaderDefines.EMPTY);
-    static final ShaderProgram MASK_OCCLUDER_SHADER = new ShaderProgram(RespawnRecap.id("mask_occluder"), DefaultVertexFormat.NEW_ENTITY, ShaderDefines.EMPTY);
-    static final ShaderProgram BLINK_GRADIENT_SHADER = new ShaderProgram(RespawnRecap.id("blink_gradient"), DefaultVertexFormat.POSITION_COLOR, ShaderDefines.EMPTY);
+    static ShaderInstance REPLAY_SHADER;
+    static ShaderInstance STREAM_SHADER;
+    static ShaderInstance MASK_OCCLUDER_SHADER;
+    static ShaderInstance BLINK_GRADIENT_SHADER;
 
-    static final RenderType REPLAY = texturedType("replay_screen", REPLAY_TEXTURE, null, REPLAY_SHADER, true);
-    static final RenderType STREAMS = texturedType("memory_stream", STREAM_TEXTURE, STREAM_REVEAL, STREAM_SHADER, false);
-    static final RenderType OCCLUDER = untexturedType("mask_occluder", MASK_OCCLUDER_SHADER, false);
+    public static void registerShaders(ShaderRegistrar registrar) throws IOException {
+        registrar.register(RespawnRecap.id("replay_screen"), DefaultVertexFormat.NEW_ENTITY, shader -> REPLAY_SHADER = shader);
+        registrar.register(RespawnRecap.id("memory_stream"), DefaultVertexFormat.NEW_ENTITY, shader -> STREAM_SHADER = shader);
+        registrar.register(RespawnRecap.id("mask_occluder"), DefaultVertexFormat.NEW_ENTITY, shader -> MASK_OCCLUDER_SHADER = shader);
+        registrar.register(RespawnRecap.id("blink_gradient"), DefaultVertexFormat.POSITION_COLOR, shader -> BLINK_GRADIENT_SHADER = shader);
+    }
+    @FunctionalInterface
+    public interface ShaderRegistrar {
+        void register(ResourceLocation id, VertexFormat format, Consumer<ShaderInstance> onLoaded) throws IOException;
+    }
+
+    static final RenderType REPLAY = texturedType("replay_screen", REPLAY_TEXTURE, null, () -> REPLAY_SHADER, true);
+    static final RenderType STREAMS = texturedType("memory_stream", STREAM_TEXTURE, STREAM_REVEAL, () -> STREAM_SHADER, false);
+    static final RenderType OCCLUDER = untexturedType("mask_occluder", () -> MASK_OCCLUDER_SHADER, false);
     static final RenderType.CompositeState BLINK_GRADIENT = RenderType.CompositeState.builder()
-            .setShaderState(new RenderStateShard.ShaderStateShard(BLINK_GRADIENT_SHADER))
+            .setShaderState(new RenderStateShard.ShaderStateShard(() -> BLINK_GRADIENT_SHADER))
             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
             .setCullState(RenderStateShard.NO_CULL)
             .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
@@ -63,19 +76,19 @@ final class RecapRenderTypes {
             String name,
             ResourceLocation texture,
             RenderStateShard.TexturingStateShard transform,
-            ShaderProgram shader,
+            Supplier<ShaderInstance> shader,
             boolean depthWrite
     ) {
         RenderType.CompositeState state =
-                compositeState(shader, new RenderStateShard.TextureStateShard(texture, TriState.FALSE, false), transform, depthWrite);
+                compositeState(shader, new RenderStateShard.TextureStateShard(texture, false, false), transform, depthWrite);
         return createType(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, true, state);
     }
 
-    private static RenderType untexturedType(String name, ShaderProgram shader, boolean depthWrite) {
+    private static RenderType untexturedType(String name, Supplier<ShaderInstance> shader, boolean depthWrite) {
         return createType(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, compositeState(shader, null, null, depthWrite));
     }
 
-    private static RenderType.CompositeState compositeState(ShaderProgram shader, RenderStateShard.TextureStateShard texture, RenderStateShard.TexturingStateShard transform, boolean depthWrite) {
+    private static RenderType.CompositeState compositeState(Supplier<ShaderInstance> shader, RenderStateShard.TextureStateShard texture, RenderStateShard.TexturingStateShard transform, boolean depthWrite) {
         RenderType.CompositeState.CompositeStateBuilder state = RenderType.CompositeState.builder()
                 .setShaderState(new RenderStateShard.ShaderStateShard(shader))
                 .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)

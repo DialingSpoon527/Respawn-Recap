@@ -1,5 +1,7 @@
 package net.dialingspoon.respawnrecap.client.model;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.dialingspoon.respawnrecap.RespawnRecap;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
@@ -11,8 +13,11 @@ import net.minecraft.resources.ResourceLocation;
 public final class MaskModel extends Model {
 	public static final ResourceLocation TEXTURE = RespawnRecap.id("textures/entity/mask.png");
 
+	public final ModelPart root;
+
 	private MaskModel(ModelPart root) {
-		super(root, RenderType::entityCutout);
+		super(RenderType::entityCutout);
+		this.root = root;
 	}
 
 	public static MaskModel create() {
@@ -181,5 +186,10 @@ public final class MaskModel extends Model {
 		blhorn.addOrReplaceChild("cube_r19", CubeListBuilder.create().texOffs(56, 40).addBox(-1.0F, -4.0F, -0.5F, 2.0F, 4.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-2.3247F, -4.7707F, -2.4863F, -0.1066F, -0.4574F, 0.8019F));
 
 		return LayerDefinition.create(mesh, 128, 128);
+	}
+
+	@Override
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, int color) {
+		root.render(poseStack, consumer, packedLight, packedOverlay, color);
 	}
 }

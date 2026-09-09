@@ -1,6 +1,5 @@
 package net.dialingspoon.respawnrecap.client;
 
-import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -33,19 +32,20 @@ public final class RecapRenderer implements AutoCloseable {
         );
         RenderSystem.setProjectionMatrix(
                 projection,
-                ProjectionType.PERSPECTIVE
+                VertexSorting.DISTANCE_TO_ORIGIN
         );
 
         Matrix4fStack modelView = RenderSystem.getModelViewStack();
         modelView.pushMatrix();
         modelView.identity();
+        RenderSystem.applyModelViewMatrix();
         try {
             if (!recapActive) {
                 renderBlink(minecraft, respawnBlink);
                 return;
             }
             RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 1.0F);
-            RenderSystem.clear(GlConst.GL_COLOR_BUFFER_BIT);
+            RenderSystem.clear(GlConst.GL_COLOR_BUFFER_BIT, false);
 
             MultiBufferSource buffers = minecraft.renderBuffers().bufferSource();
 
@@ -60,6 +60,7 @@ public final class RecapRenderer implements AutoCloseable {
             renderPass(minecraft);
         } finally {
             modelView.popMatrix();
+            RenderSystem.applyModelViewMatrix();
             RenderSystem.restoreProjectionMatrix();
         }
     }
@@ -111,7 +112,7 @@ public final class RecapRenderer implements AutoCloseable {
 
     private static void renderPass(Minecraft minecraft) {
         RenderSystem.clearDepth(1.0D);
-        RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
+        RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT, false);
         minecraft.renderBuffers().bufferSource().endBatch();
     }
 

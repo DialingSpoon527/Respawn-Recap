@@ -1,6 +1,6 @@
 {
-  "vertex": "respawnrecap:core/mask_occluder",
-  "fragment": "respawnrecap:core/mask_occluder",
+  "vertex": "respawnrecap:mask_occluder",
+  "fragment": "respawnrecap:mask_occluder",
   "samplers": [],
   "uniforms": [
     {
