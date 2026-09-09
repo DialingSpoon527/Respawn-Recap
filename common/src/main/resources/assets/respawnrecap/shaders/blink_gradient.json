@@ -1,0 +1,6 @@
+{
+  "vertex": "respawnrecap:core/blink_gradient",
+  "fragment": "respawnrecap:core/blink_gradient",
+  "samplers": [],
+  "uniforms": []
+}

@@ -73,10 +73,8 @@ public final class ReplayRecorder {
         captureInFlight = true;
         long generation = archiveGeneration;
         Path directory = currentReplayDirectory(minecraft);
-        Screenshot.takeScreenshot(
-                minecraft.getMainRenderTarget(),
-                image -> Util.ioPool().execute(() -> saveSnapshot(image, generation, directory))
-        );
+        NativeImage image = Screenshot.takeScreenshot(minecraft.getMainRenderTarget());
+        Util.ioPool().execute(() -> saveSnapshot(image, generation, directory));
     }
 
     static void archiveCurrentLife(Minecraft minecraft) {
@@ -320,7 +318,7 @@ public final class ReplayRecorder {
         if (displayPixels == null || displayPixels.getWidth() != frame.getWidth() || displayPixels.getHeight() != frame.getHeight()) {
             releaseDisplayTexture(minecraft);
             displayPixels = new NativeImage(frame.format(), frame.getWidth(), frame.getHeight(), false);
-            displayTexture = new DynamicTexture(() -> "Respawn Recap replay frame", displayPixels);
+            displayTexture = new DynamicTexture(displayPixels);
             minecraft.getTextureManager().register(RecapRenderTypes.REPLAY_TEXTURE, displayTexture);
         }
         displayPixels.copyFrom(frame);

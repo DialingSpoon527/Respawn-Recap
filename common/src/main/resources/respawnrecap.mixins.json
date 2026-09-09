@@ -9,7 +9,6 @@
     "MinecraftMixin",
     "MinecraftServerAccessor",
     "MouseHandlerMixin",
-    "RenderPipelinesAccessor",
     "RenderTypeAccessor"
   ],
   "injectors": {

@@ -1,6 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
 import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
@@ -43,9 +44,8 @@ public final class RecapRenderer implements AutoCloseable {
                 renderBlink(minecraft, respawnBlink);
                 return;
             }
-            RenderSystem.getDevice()
-                    .createCommandEncoder()
-                    .clearColorTexture(minecraft.getMainRenderTarget().getColorTexture(), BLACK);
+            RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 1.0F);
+            RenderSystem.clear(GlConst.GL_COLOR_BUFFER_BIT);
 
             MultiBufferSource buffers = minecraft.renderBuffers().bufferSource();
 
@@ -69,8 +69,7 @@ public final class RecapRenderer implements AutoCloseable {
             return;
         }
         var target = minecraft.getMainRenderTarget();
-        var color = target.getColorTexture();
-        int height = color.getHeight(0);
+        int height = target.height;
         int barHeight = Math.min((height + 1) / 2, Math.round(height * 0.5F * progress));
         if (barHeight <= 0) {
             return;
@@ -111,9 +110,8 @@ public final class RecapRenderer implements AutoCloseable {
     }
 
     private static void renderPass(Minecraft minecraft) {
-        RenderSystem.getDevice()
-                .createCommandEncoder()
-                .clearDepthTexture(minecraft.getMainRenderTarget().getDepthTexture(), 1.0D);
+        RenderSystem.clearDepth(1.0D);
+        RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
         minecraft.renderBuffers().bufferSource().endBatch();
     }
 
