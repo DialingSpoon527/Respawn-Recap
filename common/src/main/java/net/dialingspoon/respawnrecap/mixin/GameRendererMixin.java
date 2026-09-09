@@ -31,8 +31,8 @@ public abstract class GameRendererMixin {
             method = "render(Lnet/minecraft/client/DeltaTracker;Z)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
-                    shift = At.Shift.AFTER
+                    target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
+                    shift = At.Shift.BEFORE
             )
     )
     private void respawnrecap$renderRecapAfterGui(

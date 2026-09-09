@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(RenderPipelines.class)
 public interface RenderPipelinesAccessor {
-    @Accessor("MATRICES_FOG_SNIPPET")
-    static RenderPipeline.Snippet respawnrecap$matricesFogSnippet() {
+    @Accessor("MATRICES_COLOR_FOG_SNIPPET")
+    static RenderPipeline.Snippet respawnrecap$matricesColorFogSnippet() {
         throw new AssertionError();
     }
 

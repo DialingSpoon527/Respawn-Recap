@@ -13,6 +13,7 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.TriState;
 import org.joml.Matrix4f;
 
 final class RecapRenderTypes {
@@ -64,7 +65,7 @@ final class RecapRenderTypes {
             DepthTestFunction depth
     ) {
         RenderPipeline pipeline = pipeline(name, "recap_surface", true, depth);
-        RenderStateShard.TextureStateShard textureShard = new RenderStateShard.TextureStateShard(texture, false);
+        RenderStateShard.TextureStateShard textureShard = new RenderStateShard.TextureStateShard(texture, TriState.FALSE,false);
         RenderType.CompositeState.CompositeStateBuilder setup = RenderType.CompositeState.builder().setTextureState(textureShard);
         if (transform != null) {
             setup.setTexturingState(transform);
@@ -77,7 +78,7 @@ final class RecapRenderTypes {
     }
 
     private static RenderPipeline pipeline(String name, String vertexShader, boolean textured, DepthTestFunction depth) {
-        RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.respawnrecap$matricesFogSnippet())
+        RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.respawnrecap$matricesColorFogSnippet())
                 .withLocation(RespawnRecap.id("pipeline/" + name))
                 .withVertexShader(RespawnRecap.id("core/" + vertexShader))
                 .withFragmentShader(RespawnRecap.id("core/" + name))

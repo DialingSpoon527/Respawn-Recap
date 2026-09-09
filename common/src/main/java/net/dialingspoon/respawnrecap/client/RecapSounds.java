@@ -111,7 +111,7 @@ final class RecapSounds {
     private static SoundInstance createSound(String id) {
         return new SimpleSoundInstance(
                 RespawnRecap.id(id),
-                SoundSource.UI,
+                SoundSource.RECORDS,
                 VOLUME,
                 1.0F,
                 RandomSource.create(),
@@ -205,7 +205,7 @@ final class RecapSounds {
 
     private static final class LoopSound extends AbstractTickableSoundInstance {
         private LoopSound(ResourceLocation id, float volume) {
-            super(SoundEvent.createVariableRangeEvent(id), SoundSource.UI, RandomSource.create());
+            super(SoundEvent.createVariableRangeEvent(id), SoundSource.RECORDS, RandomSource.create());
             this.looping = true;
             this.relative = true;
             this.attenuation = Attenuation.NONE;
