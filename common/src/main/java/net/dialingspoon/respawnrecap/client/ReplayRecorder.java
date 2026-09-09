@@ -74,7 +74,7 @@ public final class ReplayRecorder {
         long generation = archiveGeneration;
         Path directory = currentReplayDirectory(minecraft);
         Screenshot.takeScreenshot(
-                minecraft.gameRenderer.mainRenderTarget(),
+                minecraft.getMainRenderTarget(),
                 image -> Util.ioPool().execute(() -> saveSnapshot(image, generation, directory))
         );
     }

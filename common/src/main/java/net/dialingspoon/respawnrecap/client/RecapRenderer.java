@@ -1,30 +1,23 @@
 package net.dialingspoon.respawnrecap.client;
 
-import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
-import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Matrix4fStack;
-import org.joml.Vector4f;
-
-import java.util.Optional;
 
 public final class RecapRenderer implements AutoCloseable {
-    private static final Vector4f BLACK = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
+    private static final int BLACK = 0xFF000000;
     private static final float NEAR_PLANE = 0.05F;
     private static final float FAR_PLANE = 100.0F;
     private static final float BLINK_FEATHER_FRACTION = 0.03F;
 
     private final Projection projection = new Projection();
     private final ProjectionMatrixBuffer projectionBuffer = new ProjectionMatrixBuffer("Respawn Recap projection");
-    private final StagedVertexBuffer blinkBuffer = new StagedVertexBuffer(() -> "Respawn Recap blink", 256);
 
     public void render(Minecraft minecraft, FeatureRenderDispatcher dispatcher) {
         float respawnBlink = RecapController.respawnBlinkProgress();
@@ -47,17 +40,21 @@ public final class RecapRenderer implements AutoCloseable {
             }
             RenderSystem.getDevice()
                     .createCommandEncoder()
-                    .clearColorTexture(minecraft.gameRenderer.mainRenderTarget().getColorTexture(), BLACK);
-            SubmitNodeStorage nodes = new SubmitNodeStorage();
+                    .clearColorTexture(minecraft.getMainRenderTarget().getColorTexture(), BLACK);
+
+            SubmitNodeStorage nodes = dispatcher.getSubmitNodeStorage();
+
             RecapScene.submitEffects(minecraft, nodes);
-            renderPass(minecraft, dispatcher, nodes);
-            nodes = new SubmitNodeStorage();
+            renderPass(minecraft, dispatcher);
+
             RecapScene.submitOccluder(nodes);
-            renderPass(minecraft, dispatcher, nodes);
+            renderPass(minecraft, dispatcher);
             renderBlink(minecraft, RecapTimeline.blinkProgress());
-            nodes = new SubmitNodeStorage();
+
             RecapScene.submitMask(nodes);
-            renderPass(minecraft, dispatcher, nodes);
+            renderPass(minecraft, dispatcher);
+
+            dispatcher.endFrame();
         } finally {
             modelView.popMatrix();
             RenderSystem.restoreProjectionMatrix();
@@ -68,7 +65,7 @@ public final class RecapRenderer implements AutoCloseable {
         if (progress <= 0.0F) {
             return;
         }
-        var target = minecraft.gameRenderer.mainRenderTarget();
+        var target = minecraft.getMainRenderTarget();
         var color = target.getColorTexture();
         var depth = target.getDepthTexture();
         int width = color.getWidth(0);
@@ -88,46 +85,36 @@ public final class RecapRenderer implements AutoCloseable {
         }
         float boundary = 1.0F - 2.0F * barHeight / height;
         float feather = 1.0F - 2.0F * (barHeight + featherHeight) / height;
-        var draw = this.blinkBuffer.appendDraw(DefaultVertexFormat.POSITION_COLOR, PrimitiveTopology.QUADS);
-        VertexConsumer vertices = this.blinkBuffer.getVertexBuilder(draw);
+        BufferBuilder vertices = Tesselator.getInstance().begin(
+                VertexFormat.Mode.QUADS,
+                DefaultVertexFormat.POSITION_COLOR
+        );
+
         addGradientQuad(vertices, boundary, feather);
         addGradientQuad(vertices, -boundary, -feather);
-        this.blinkBuffer.upload();
-        var executeInfo = this.blinkBuffer.getExecuteInfo(draw);
-        if (executeInfo != null) {
-            try (var renderPass = encoder.createRenderPass(
-                    () -> "Respawn Recap blink feather",
-                    target.getColorTextureView(),
-                    Optional.empty()
-            )) {
-                renderPass.setPipeline(RecapRenderTypes.BLINK_GRADIENT);
-                renderPass.setVertexBuffer(0, executeInfo.vertexBuffer().slice());
-                renderPass.setIndexBuffer(executeInfo.indexBuffer(), executeInfo.indexType());
-                renderPass.drawIndexed(executeInfo.indexCount(), 1, executeInfo.firstIndex(), executeInfo.baseVertex(), 0);
-            }
-        }
-        this.blinkBuffer.endFrame();
+
+        RecapRenderTypes.BLINK_GRADIENT_TYPE.draw(vertices.buildOrThrow());
     }
 
     private static void addGradientQuad(VertexConsumer vertices, float boundary, float feather) {
-        vertices.addVertex(-1.0F, boundary, 0.0F).setColor(0xFF000000);
+        vertices.addVertex(-1.0F, boundary, 0.0F).setColor(BLACK);
         vertices.addVertex(-1.0F, feather, 0.0F).setColor(0x00000000);
         vertices.addVertex(1.0F, feather, 0.0F).setColor(0x00000000);
-        vertices.addVertex(1.0F, boundary, 0.0F).setColor(0xFF000000);
+        vertices.addVertex(1.0F, boundary, 0.0F).setColor(BLACK);
     }
 
-    private static void renderPass(Minecraft minecraft, FeatureRenderDispatcher dispatcher, SubmitNodeStorage nodes) {
+    private static void renderPass(Minecraft minecraft, FeatureRenderDispatcher dispatcher) {
         RenderSystem.getDevice()
                 .createCommandEncoder()
-                .clearDepthTexture(minecraft.gameRenderer.mainRenderTarget().getDepthTexture(), 0.0D);
-        dispatcher.renderAllFeatures(nodes);
+                .clearDepthTexture(minecraft.getMainRenderTarget().getDepthTexture(), 1.0D);
+        dispatcher.renderAllFeatures();
+        minecraft.renderBuffers().bufferSource().endBatch();
     }
 
     @Override
     public void close() {
         Minecraft minecraft = Minecraft.getInstance();
         RecapController.close(minecraft);
-        this.blinkBuffer.close();
         this.projectionBuffer.close();
     }
 }

@@ -1,16 +1,15 @@
 package net.dialingspoon.respawnrecap.client;
 
-import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.dialingspoon.respawnrecap.RespawnRecap;
 import net.dialingspoon.respawnrecap.mixin.RenderPipelinesAccessor;
 import net.dialingspoon.respawnrecap.mixin.RenderTypeAccessor;
-import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.TextureTransform;
@@ -23,7 +22,7 @@ final class RecapRenderTypes {
 
     private static final Identifier STREAM_TEXTURE = RespawnRecap.id("textures/gui/memory_stream.png");
     private static final long STREAM_CYCLE_MILLIS = 12000L;
-    private static final DepthStencilState OVERLAY_DEPTH = new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false);
+    private static final DepthStencilState OVERLAY_DEPTH = new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false);
     private static final TextureTransform STREAM_REVEAL = new TextureTransform(
             "respawn_recap_stream_reveal",
             () -> new Matrix4f().translation(
@@ -43,9 +42,14 @@ final class RecapRenderTypes {
                     .withFragmentShader(RespawnRecap.id("core/blink_gradient"))
                     .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                     .withCull(false)
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
                     .build()
+    );
+    public static final RenderType BLINK_GRADIENT_TYPE = RenderTypeAccessor.respawnrecap$create(
+            "respawn_recap_blink_gradient",
+            RenderSetup.builder(BLINK_GRADIENT)
+                    .bufferSize(RenderType.SMALL_BUFFER_SIZE)
+                    .createRenderSetup()
     );
 
     private RecapRenderTypes() {
@@ -76,11 +80,10 @@ final class RecapRenderTypes {
                 .withFragmentShader(RespawnRecap.id("core/" + name))
                 .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                 .withCull(false)
-                .withVertexBinding(0, DefaultVertexFormat.ENTITY)
-                .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
                 .withDepthStencilState(depth);
         if (textured) {
-            builder.withBindGroupLayout(BindGroupLayouts.SAMPLER0);
+            builder.withSampler("Sampler0");
         }
         return RenderPipelinesAccessor.respawnrecap$register(builder.build());
     }
