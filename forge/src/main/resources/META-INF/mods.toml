@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[1,)"
+loaderVersion = "[46,)"
 license = "MIT"
 issueTrackerURL = "https://github.com/DialingSpoon527/Respawn-Recap/issues"
 
@@ -15,18 +15,16 @@ outer wilds inspired respawn animation
 '''
 
 [[dependencies.respawnrecap]]
-modId = "neoforge"
+modId = "forge"
 mandatory = true
-versionRange = "(20.1, 20.5)"
+versionRange = "[46,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.respawnrecap]]
 modId = "minecraft"
 mandatory = true
-versionRange = "(1.20.1, 1.20.5)"
+versionRange = "(1.19.4, 1.20.2)"
 ordering = "NONE"
 side = "CLIENT"
 
-[[mixins]]
-config = "respawnrecap.mixins.json"

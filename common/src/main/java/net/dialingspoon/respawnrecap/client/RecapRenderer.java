@@ -16,7 +16,7 @@ public final class RecapRenderer implements AutoCloseable {
     public void render(Minecraft minecraft) {
         float respawnBlink = RecapController.respawnBlinkProgress();
         boolean recapActive = RecapController.isActive();
-        if (!minecraft.isGameLoadFinished() || (!recapActive && respawnBlink <= 0.0F)) {
+        if (minecraft.level == null || minecraft.player == null || (!recapActive && respawnBlink <= 0.0F)) {
             return;
         }
         int width = Math.max(1, minecraft.getWindow().getWidth());
