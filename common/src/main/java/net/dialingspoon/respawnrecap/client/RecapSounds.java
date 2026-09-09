@@ -8,6 +8,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
 import java.io.IOException;
@@ -155,7 +156,7 @@ final class RecapSounds {
         if (start == end) {
             return 0.0F;
         }
-        return Math.clamp((value - start) / (float) (end - start), 0.0F, 1.0F);
+        return Mth.clamp((value - start) / (float) (end - start), 0.0F, 1.0F);
     }
 
     private static final class Cue {

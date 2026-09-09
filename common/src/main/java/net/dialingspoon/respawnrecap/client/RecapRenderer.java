@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 
 public final class RecapRenderer implements AutoCloseable {
     private static final int BLACK = 0xFF000000;
@@ -35,9 +34,9 @@ public final class RecapRenderer implements AutoCloseable {
                 VertexSorting.DISTANCE_TO_ORIGIN
         );
 
-        Matrix4fStack modelView = RenderSystem.getModelViewStack();
-        modelView.pushMatrix();
-        modelView.identity();
+        PoseStack modelView = RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.setIdentity();
         RenderSystem.applyModelViewMatrix();
         try {
             if (!recapActive) {
@@ -59,7 +58,7 @@ public final class RecapRenderer implements AutoCloseable {
             RecapScene.submitMask(buffers);
             renderPass(minecraft);
         } finally {
-            modelView.popMatrix();
+            modelView.popPose();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.restoreProjectionMatrix();
         }

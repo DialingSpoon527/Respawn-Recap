@@ -29,8 +29,8 @@ public abstract class GameRendererMixin {
     @Inject(
             method = "render",
             at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphics;F)V",
+                    value = "CONSTANT",
+                    args = "stringValue=toasts",
                     shift = At.Shift.BEFORE
             )
     )

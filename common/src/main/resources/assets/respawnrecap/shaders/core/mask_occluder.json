@@ -1,6 +1,7 @@
 {
   "vertex": "respawnrecap:mask_occluder",
   "fragment": "respawnrecap:mask_occluder",
+  "attributes": ["Position", "Color", "UV0", "UV1", "UV2", "Normal"],
   "samplers": [],
   "uniforms": [
     {

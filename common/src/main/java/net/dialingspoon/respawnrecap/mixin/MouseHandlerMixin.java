@@ -25,7 +25,7 @@ public abstract class MouseHandlerMixin {
     }
 
     @Inject(method = "turnPlayer", at = @At("HEAD"), cancellable = true)
-    private void respawnrecap$blockTurning(double frameTime, CallbackInfo ci) {
+    private void respawnrecap$blockTurning(CallbackInfo ci) {
         if (RecapController.isActive()) {
             ci.cancel();
         }

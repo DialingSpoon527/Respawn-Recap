@@ -263,7 +263,7 @@ public final class ReplayRecorder {
                     LOGGER.warn("Failed to index replay snapshots", exception);
                 }
             }
-            nextSnapshotId = ACTIVE_SNAPSHOTS.isEmpty() ? 0L : ACTIVE_SNAPSHOTS.getLast().id() + 1L;
+            nextSnapshotId = ACTIVE_SNAPSHOTS.isEmpty() ? 0L : ACTIVE_SNAPSHOTS.get(ACTIVE_SNAPSHOTS.size() - 1).id() + 1L;
             try {
                 trimArchive();
             } catch (IOException exception) {

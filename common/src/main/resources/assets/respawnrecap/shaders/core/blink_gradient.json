@@ -1,6 +1,7 @@
 {
   "vertex": "respawnrecap:blink_gradient",
   "fragment": "respawnrecap:blink_gradient",
+  "attributes": ["Position", "Color"],
   "samplers": [],
   "uniforms": [],
   "blend": {

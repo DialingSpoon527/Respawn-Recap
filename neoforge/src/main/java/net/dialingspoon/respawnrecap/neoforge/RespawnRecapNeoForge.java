@@ -6,9 +6,10 @@ import net.dialingspoon.respawnrecap.client.RespawnRecapConfigScreen;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.ConfigScreenHandler;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -17,8 +18,12 @@ import java.io.UncheckedIOException;
 public final class RespawnRecapNeoForge {
     public RespawnRecapNeoForge(ModContainer container, IEventBus modBus) {
         modBus.addListener(RespawnRecapNeoForge::registerShaders);
-        container.registerExtensionPoint(IConfigScreenFactory.class,
-                (ignored, parent) -> new RespawnRecapConfigScreen(parent));
+        ModLoadingContext.get().registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (minecraft, parent) -> new RespawnRecapConfigScreen(parent)
+                )
+        );
     }
 
     private static void registerShaders(RegisterShadersEvent event) {
