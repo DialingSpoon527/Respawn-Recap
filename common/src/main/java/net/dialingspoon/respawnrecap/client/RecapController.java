@@ -1,9 +1,9 @@
 package net.dialingspoon.respawnrecap.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
-import org.lwjgl.glfw.GLFW;
 
 public final class RecapController {
     private static final long SKIP_GRACE_PERIOD_MILLIS = 500L;
@@ -79,7 +79,7 @@ public final class RecapController {
     }
 
     public static void keyboardInput(int key, int action) {
-        if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_PRESS && state == State.DEATH_REPLAY) {
+        if (key == InputConstants.KEY_ESCAPE && action == InputConstants.PRESS && state == State.DEATH_REPLAY) {
             finishReplay(Minecraft.getInstance());
             return;
         }
@@ -144,7 +144,7 @@ public final class RecapController {
         if (state != State.DEATH_REPLAY) {
             return;
         }
-        if (action == GLFW.GLFW_PRESS) {
+        if (action == InputConstants.PRESS) {
             heldInputCount++;
             if (RecapTimeline.elapsedMillis() < SKIP_GRACE_PERIOD_MILLIS) {
                 return;
@@ -152,7 +152,7 @@ public final class RecapController {
             long now = Util.getMillis();
             skipRequested = firstInputPressMillis >= 0L && now - firstInputPressMillis <= DOUBLE_INPUT_WINDOW_MILLIS;
             firstInputPressMillis = skipRequested ? -1L : now;
-        } else if (action == GLFW.GLFW_RELEASE) {
+        } else if (action == InputConstants.RELEASE) {
             heldInputCount = Math.max(0, heldInputCount - 1);
             if (heldInputCount == 0) {
                 heldInputTicks = 0;

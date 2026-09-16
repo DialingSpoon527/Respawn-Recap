@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
 
 final class RecapScene {
     private static final ReplayPlaneModel REPLAY_PLANE = ReplayPlaneModel.create();
@@ -86,7 +87,7 @@ final class RecapScene {
         for (StreamPlacement stream : STREAMS) {
             POSE.setIdentity();
             POSE.translate(0.0F, 0.0F, z + stream.depth());
-            POSE.mulPose(Axis.ZP.rotationDegrees(stream.roll()));
+            POSE.mulPose(new Matrix4f().rotationZ((float) Math.toRadians(stream.roll())));
             POSE.scale(STREAM_XY_SCALE, STREAM_XY_SCALE, STREAM_Z_SCALE);
             submit(STREAM_MODEL, collector, RecapRenderTypes.STREAMS, STREAM_TINT);
         }
@@ -115,7 +116,7 @@ final class RecapScene {
             RenderType renderType,
             int tint
     ) {
-        collector.submitModel(model, RENDER_STATE, POSE, renderType, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint, null, 0, null);
+        collector.submitModel(model, RENDER_STATE, POSE, renderType, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint, null, 0);
     }
 
     private static int argb(int brightness) {

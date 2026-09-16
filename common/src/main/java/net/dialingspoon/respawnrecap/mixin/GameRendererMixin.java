@@ -33,14 +33,14 @@ public abstract class GameRendererMixin {
     }
 
     @Inject(
-            method = "render(Lnet/minecraft/client/DeltaTracker;Z)V",
+            method = "render",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/render/GuiRenderer;render()V",
                     shift = At.Shift.AFTER
             )
     )
-    private void respawnrecap$renderGuiThenRecap(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
+    private void respawnrecap$renderGuiThenRecap(CallbackInfo ci) {
         ReplayRecorder.capturePendingFrame(this.minecraft);
         this.respawnrecap$recapRenderer.render(this.minecraft, this.featureRenderDispatcher);
     }

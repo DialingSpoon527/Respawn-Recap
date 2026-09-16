@@ -1,6 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -15,6 +16,7 @@ import org.joml.Matrix4fStack;
 import org.joml.Vector4f;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 public final class RecapRenderer implements AutoCloseable {
     private static final Vector4f BLACK = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
@@ -78,8 +80,8 @@ public final class RecapRenderer implements AutoCloseable {
             return;
         }
         var encoder = RenderSystem.getDevice().createCommandEncoder();
-        encoder.clearColorAndDepthTextures(color, BLACK, depth, 0.0D, 0, 0, width, barHeight);
-        encoder.clearColorAndDepthTextures(color, BLACK, depth, 0.0D, 0, height - barHeight, width, barHeight);
+        encoder.clearColorAndDepthTextures(color, BLACK, depth, 0.0D, 0, 0, width, barHeight, 0);
+        encoder.clearColorAndDepthTextures(color, BLACK, depth, 0.0D, 0, height - barHeight, width, barHeight, 0);
 
         int openHeight = height - barHeight * 2;
         int featherHeight = Math.min(openHeight / 2, Math.max(1, Math.round(height * BLINK_FEATHER_FRACTION)));
@@ -100,7 +102,7 @@ public final class RecapRenderer implements AutoCloseable {
                     target.getColorTextureView(),
                     Optional.empty()
             )) {
-                renderPass.setPipeline(RecapRenderTypes.BLINK_GRADIENT);
+                renderPass.setPipeline(RenderSystem.getCompiledPipeline(RecapRenderTypes.BLINK_GRADIENT));
                 renderPass.setVertexBuffer(0, executeInfo.vertexBuffer().slice());
                 renderPass.setIndexBuffer(executeInfo.indexBuffer(), executeInfo.indexType());
                 renderPass.drawIndexed(executeInfo.indexCount(), 1, executeInfo.firstIndex(), executeInfo.baseVertex(), 0);
@@ -117,10 +119,29 @@ public final class RecapRenderer implements AutoCloseable {
     }
 
     private static void renderPass(Minecraft minecraft, FeatureRenderDispatcher dispatcher, SubmitNodeStorage nodes) {
-        RenderSystem.getDevice()
-                .createCommandEncoder()
-                .clearDepthTexture(minecraft.gameRenderer.mainRenderTarget().getDepthTexture(), 0.0D);
-        dispatcher.renderAllFeatures(nodes);
+        var target = minecraft.gameRenderer.mainRenderTarget();
+        var encoder = RenderSystem.getDevice().createCommandEncoder();
+
+        encoder.clearDepthTexture(
+                target.getDepthTexture(),
+                0.0D
+        );
+
+        try (
+                FeatureRenderDispatcher.PreparedFrame frame =
+                        dispatcher.prepareFrame(nodes);
+
+                RenderPass renderPass = encoder.createRenderPass(
+                        () -> "Respawn Recap features",
+                        target.getColorTextureView(),
+                        Optional.empty(),
+                        target.getDepthTextureView(),
+                        OptionalDouble.empty()
+                )
+        ) {
+            RenderSystem.bindDefaultUniforms(renderPass);
+            FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+        }
     }
 
     @Override
