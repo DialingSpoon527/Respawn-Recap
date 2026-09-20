@@ -31,6 +31,7 @@ configurations {
 }
 
 repositories {
+    maven { url = 'https://thedarkcolour.github.io/KotlinForForge/' }
     maven {
         name = 'NeoForged'
         url = 'https://maven.neoforged.net/releases'
@@ -38,18 +39,21 @@ repositories {
 }
 
 dependencies {
+    implementation "thedarkcolour:kotlinforforge-neoforge:$rootProject.kotlin_for_forge_version"
     neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
 
     common(project(path: ':common')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
-    shadowBundle "com.github.usefulness:webp-imageio:0.11.0"
+    implementation("com.github.usefulness:webp-imageio:$rootProject.webp_version") { transitive = false }
+    shadowBundle("com.github.usefulness:webp-imageio:$rootProject.webp_version") { transitive = false }
 }
 
 processResources {
     inputs.property 'version', project.version
+    inputs.property 'kotlin_for_forge_version', rootProject.kotlin_for_forge_version
 
     filesMatching('META-INF/neoforge.mods.toml') {
-        expand version: project.version
+        expand version: project.version, kotlin_for_forge_version: rootProject.kotlin_for_forge_version
     }
 }
 
