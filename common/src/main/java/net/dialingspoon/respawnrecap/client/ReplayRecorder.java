@@ -1,6 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
 import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPImageWriterSpi;
 import com.luciad.imageio.webp.WebPWriteParam;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.logging.LogUtils;
@@ -17,7 +18,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -214,7 +214,7 @@ public final class ReplayRecorder {
         BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         buffered.setRGB(0, 0, width, height, pixels, 0, width);
 
-        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+        ImageWriter writer = new WebPImageWriterSpi().createWriterInstance();
         WebPWriteParam params = (WebPWriteParam) writer.getDefaultWriteParam();
         params.setCompressionType(CompressionType.Lossy);
         params.setCompressionQuality(0.90f);
@@ -289,7 +289,7 @@ public final class ReplayRecorder {
         int width = buffered.getWidth();
         int height = buffered.getHeight();
 
-        int[] pixels = ((DataBufferInt) buffered.getRaster().getDataBuffer()).getData();
+        int[] pixels = buffered.getRGB(0, 0, width, height, null, 0, width);
 
         NativeImage image = new NativeImage(width, height, true);
 
