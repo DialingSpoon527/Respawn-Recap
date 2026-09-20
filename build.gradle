@@ -1,6 +1,6 @@
 plugins {
     id "architectury-plugin" version "3.5-SNAPSHOT"
-    id "dev.architectury.loom-no-remap" version "1.14-SNAPSHOT" apply false
+    id "dev.architectury.loom-no-remap" version "1.17-SNAPSHOT" apply false
     id 'com.gradleup.shadow' version '8.3.10' apply false
 }
 
@@ -28,7 +28,6 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
-        implementation "com.github.usefulness:webp-imageio:0.11.0"
     }
 
     java {
