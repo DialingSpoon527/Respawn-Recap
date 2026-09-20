@@ -15,6 +15,13 @@ outer wilds inspired respawn animation
 '''
 
 [[dependencies.respawnrecap]]
+modId = "kotlinforforge"
+type = "required"
+versionRange = "[${kotlin_for_forge_version},6)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.respawnrecap]]
 modId = "neoforge"
 type = "required"
 versionRange = "(21.5, 21.9)"
