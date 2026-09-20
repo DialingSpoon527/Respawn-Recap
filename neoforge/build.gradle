@@ -42,8 +42,9 @@ dependencies {
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
-    shadowBundle "com.github.usefulness:webp-imageio:0.11.0"
-    forgeRuntimeLibrary "com.github.usefulness:webp-imageio:0.11.0"
+    implementation("com.github.usefulness:webp-imageio:$rootProject.webp_version") { transitive = false }
+    shadowBundle "com.github.usefulness:webp-imageio:$rootProject.webp_version"
+    forgeRuntimeLibrary "com.github.usefulness:webp-imageio:$rootProject.webp_version"
 }
 
 processResources {
@@ -59,6 +60,9 @@ jar {
 }
 
 shadowJar {
+    relocate 'kotlin', 'net.dialingspoon.respawnrecap.internal.kotlin'
+    exclude 'org/jetbrains/annotations/**'
+    exclude 'org/intellij/lang/annotations/**'
     dependsOn(jar)
     mainSpec.sourcePaths.clear()
     from(jar)

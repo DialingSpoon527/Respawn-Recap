@@ -98,17 +98,17 @@ public final class RecapRenderer implements AutoCloseable {
     }
 
     private static void addGradientQuad(VertexConsumer vertices, float boundary, float feather) {
-        vertices.vertex(-1.0F, boundary, 0.0F).color(BLACK);
-        vertices.vertex(-1.0F, feather, 0.0F).color(0x00000000);
-        vertices.vertex(1.0F, feather, 0.0F).color(0x00000000);
-        vertices.vertex(1.0F, boundary, 0.0F).color(BLACK);
+        vertices.vertex(-1.0F, boundary, 0.0F).color(BLACK).endVertex();
+        vertices.vertex(-1.0F, feather, 0.0F).color(0x00000000).endVertex();
+        vertices.vertex(1.0F, feather, 0.0F).color(0x00000000).endVertex();
+        vertices.vertex(1.0F, boundary, 0.0F).color(BLACK).endVertex();
     }
 
     private static void addSolidQuad(VertexConsumer vertices, float y1, float y2) {
-        vertices.vertex(-1.0F, y1, 0.0F).color(BLACK);
-        vertices.vertex( 1.0F, y1, 0.0F).color(BLACK);
-        vertices.vertex( 1.0F, y2, 0.0F).color(BLACK);
-        vertices.vertex(-1.0F, y2, 0.0F).color(BLACK);
+        vertices.vertex(-1.0F, y1, 0.0F).color(BLACK).endVertex();
+        vertices.vertex( 1.0F, y1, 0.0F).color(BLACK).endVertex();
+        vertices.vertex( 1.0F, y2, 0.0F).color(BLACK).endVertex();
+        vertices.vertex(-1.0F, y2, 0.0F).color(BLACK).endVertex();
     }
 
     private static void renderPass(Minecraft minecraft) {
