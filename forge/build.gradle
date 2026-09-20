@@ -31,6 +31,7 @@ configurations {
 }
 
 repositories {
+    maven { url = 'https://thedarkcolour.github.io/KotlinForForge/' }
     maven {
         name = 'MinecraftForge'
         url = 'https://maven.minecraftforge.net/'
@@ -39,18 +40,32 @@ repositories {
 
 dependencies {
     forge "net.minecraftforge:forge:$rootProject.forge_version"
+    implementation "thedarkcolour:kotlinforforge:$rootProject.kotlin_for_forge_version"
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
-    shadowBundle "com.github.usefulness:webp-imageio:0.11.0"
-    forgeRuntimeLibrary "com.github.usefulness:webp-imageio:0.11.0"
+    implementation("com.github.usefulness:webp-imageio:$rootProject.forge_webp_version") { transitive = false }
+    shadowBundle("com.github.usefulness:webp-imageio:$rootProject.forge_webp_version") { transitive = false }
+}
+
+loom {
+    mods {
+        respawnrecap {
+            sourceSet sourceSets.main
+            // Keep WebP in the mod layer so it can access KotlinForForge in development.
+            dependency(project.dependencies.create("com.github.usefulness:webp-imageio:$rootProject.forge_webp_version") {
+                transitive = false
+            })
+        }
+    }
 }
 
 processResources {
     inputs.property 'version', project.version
+    inputs.property 'kotlin_for_forge_version', rootProject.kotlin_for_forge_version
 
     filesMatching('META-INF/mods.toml') {
-        expand version: project.version
+        expand version: project.version, kotlin_for_forge_version: rootProject.kotlin_for_forge_version
     }
 }
 

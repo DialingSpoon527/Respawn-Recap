@@ -37,18 +37,21 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+    modImplementation "net.fabricmc:fabric-language-kotlin:$rootProject.fabric_kotlin_version"
     modCompileOnly "com.terraformersmc:modmenu:$rootProject.modmenu_version"
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
-    shadowBundle "com.github.usefulness:webp-imageio:0.11.0"
+    implementation("com.github.usefulness:webp-imageio:$rootProject.fabric_webp_version") { transitive = false }
+    shadowBundle("com.github.usefulness:webp-imageio:$rootProject.fabric_webp_version") { transitive = false }
 }
 
 processResources {
     inputs.property 'version', project.version
+    inputs.property 'fabric_kotlin_version', rootProject.fabric_kotlin_version
 
     filesMatching('fabric.mod.json') {
-        expand version: project.version
+        expand version: project.version, fabric_kotlin_version: rootProject.fabric_kotlin_version
     }
 }
 
