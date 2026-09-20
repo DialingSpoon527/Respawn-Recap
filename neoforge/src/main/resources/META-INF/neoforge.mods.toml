@@ -8,7 +8,7 @@ modId = "respawnrecap"
 version = "${version}"
 displayName = "Respawn Recap"
 displayURL = "https://github.com/DialingSpoon527/Respawn-Recap"
-BannerFile = "icon.png"
+iconFile = "icon.png"
 authors = "DialingSpoon"
 description = '''
 outer wilds inspired respawn animation
