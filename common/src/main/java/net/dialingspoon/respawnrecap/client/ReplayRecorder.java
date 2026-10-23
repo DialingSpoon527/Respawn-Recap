@@ -1,6 +1,7 @@
 package net.dialingspoon.respawnrecap.client;
 
 import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPImageReaderSpi;
 import com.luciad.imageio.webp.WebPImageWriterSpi;
 import com.luciad.imageio.webp.WebPWriteParam;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -14,8 +15,9 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.slf4j.Logger;
 
 import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -270,7 +272,7 @@ public final class ReplayRecorder {
                     return;
                 }
                 try {
-                    BufferedImage buffered = ImageIO.read(path.toFile());
+                    BufferedImage buffered = readWebP(path);
                     NativeImage image = toNativeImage(buffered);
                     loadedFrames.add(flippedCopy(image));
                 } catch (IOException exception) {
@@ -283,6 +285,16 @@ public final class ReplayRecorder {
             }
             minecraft.execute(() -> acceptLoadedFrames(loadedFrames, generation));
         });
+    }
+
+    private static BufferedImage readWebP(Path path) throws IOException {
+        ImageReader reader = new WebPImageReaderSpi().createReaderInstance();
+        try (FileImageInputStream input = new FileImageInputStream(path.toFile())) {
+            reader.setInput(input);
+            return reader.read(0);
+        } finally {
+            reader.dispose();
+        }
     }
 
     private static NativeImage toNativeImage(BufferedImage buffered) {
