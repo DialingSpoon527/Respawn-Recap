@@ -2,7 +2,7 @@
 
 ### An Outer Wilds-inspired client-side respawn animation for Minecraft.
 
-Requires [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) on Fabric. NeoForge bundles a private, relocated Kotlin runtime; Kotlin for Forge is not required.
+Requires [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) on Fabric, and [Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge) on NeoForge.
 
 ![Respawn Recap](media/respawn-recap-demo.gif)
 
